@@ -1,0 +1,36 @@
+import "Unigram.Native.Calls.idl";
+import "VoipGroupDescriptor.idl";
+import "GroupNetworkStateChangedEventArgs.idl";
+import "FrameRequestedEventArgs.idl";
+
+namespace Unigram.Native.Calls
+{
+    delegate void EmitJsonPayloadDelegate(Int32 ssrc, Telegram.Td.Api.GroupCallPayload payload);
+
+    [default_interface]
+    runtimeclass VoipGroupManager : Windows.Foundation.IClosable
+    {
+        VoipGroupManager(VoipGroupDescriptor descriptor);
+
+        void SetConnectionMode(VoipGroupConnectionMode connectionMode, Boolean keepBroadcastIfWasEnabled);
+
+        void EmitJoinPayload(EmitJsonPayloadDelegate completion);
+        [default_overload]
+        void SetJoinResponsePayload(Telegram.Td.Api.GroupCallJoinResponseWebrtc payload);
+        void SetJoinResponsePayload(Telegram.Td.Api.GroupCallJoinResponseWebrtc payload, Windows.Foundation.Collections.IVector<Telegram.Td.Api.GroupCallParticipant> participants);
+        void AddParticipants(Windows.Foundation.Collections.IVector<Telegram.Td.Api.GroupCallParticipant> participants);
+        void RemoveSsrcs(Windows.Foundation.Collections.IVector<Int32> ssrcs);
+
+        Boolean IsMuted;
+
+        void SetAudioOutputDevice(String id);
+        void SetAudioInputDevice(String id);
+
+        void SetVolume(Int32 ssrc, Double volume);
+
+        event Windows.Foundation.TypedEventHandler<VoipGroupManager, GroupNetworkStateChangedEventArgs> NetworkStateUpdated;
+        event Windows.Foundation.TypedEventHandler<VoipGroupManager, Windows.Foundation.Collections.IMapView<Int32, Windows.Foundation.Collections.IKeyValuePair<Single, Boolean> > > AudioLevelsUpdated;
+
+        event Windows.Foundation.TypedEventHandler<VoipGroupManager, FrameRequestedEventArgs> FrameRequested;
+    }
+}
